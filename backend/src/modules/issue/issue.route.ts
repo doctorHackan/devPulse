@@ -10,5 +10,6 @@ route.post("/",auth(ROLE.contributor, ROLE.maintainer),issueController.createIss
 route.get("/",issueController.getAllIssues);
 route.get("/:id",issueController.getSingleIssue);
 route.patch("/:id",auth(ROLE.contributor, ROLE.maintainer),issueUpdateMiddleware, issueController.updateIssue);
+route.delete("/:id",auth(ROLE.maintainer),issueController.deleteIssue);
 
 export const issueRoute = route;
