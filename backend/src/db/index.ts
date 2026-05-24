@@ -1,10 +1,14 @@
-import {neon} from "@neondatabase/serverless";
+// import {neon} from "@neondatabase/serverless";
+import {Pool} from "pg";
 import config from "../config";
 
-export const sql = neon(config.connection_str);
+// export const sql = neon(config.connection_str);
+export const pool = new Pool({
+    connectionString : config.connection_str,
+});
 
 export const initDB = async()=>{
-    await sql `
+    await pool.query( `
         CREATE TABLE IF NOT EXISTS users(
             id SERIAL PRIMARY KEY,
             name VARCHAR(32) NOT NULL,
@@ -15,8 +19,8 @@ export const initDB = async()=>{
             created_at TIMESTAMP DEFAULT NOW(),
             updated_at TIMESTAMP DEFAULT NOW()
         )
-    `
-    await sql `
+    `)
+    await pool.query( `
         CREATE TABLE IF NOT EXISTS issues(
             id SERIAL PRIMARY KEY,
             title VARCHAR(152) NOT NULL,
@@ -29,6 +33,6 @@ export const initDB = async()=>{
             updated_at TIMESTAMP DEFAULT NOW()
         )
     
-    `
+    `)
     console.log("DB connection successfull");
 };

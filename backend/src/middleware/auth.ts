@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import type { ROLE } from "../types";
 import  jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
-import { sql } from "../db";
+import { pool} from "../db";
 import sendResponse from "../utility/sendResponse";
 
 
@@ -19,13 +19,14 @@ const auth = (...roles : ROLE[])=>{
             }
 
             const payload  = jwt.verify(token as string, config.secret) as JwtPayload;
+            
             const user = {...payload};
             const {id, role, name} = user;
-            const result = await sql`
+            const result = await pool.query(`
                 SELECT * FROM users
-                WHERE id = ${id}
-            `
-            if(result.length === 0){
+                WHERE id = $1
+            `,[id])
+            if(result.rows[0].length === 0){
                 throw new Error("User Not Found");
             }
 
@@ -39,7 +40,7 @@ const auth = (...roles : ROLE[])=>{
         }
         catch(err : any){
             sendResponse(res, {
-                statusCode: 500,
+                statusCode: 401,
                 success: false,
                 message: err.message,
                 error: err,
