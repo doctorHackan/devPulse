@@ -40,7 +40,7 @@ const getAllIssues = async (req: Request, res: Response) => {
             data : result,
         })
     } catch (err: any) {
-        console.error(err);
+        // console.error(err);
         res.status(500).json({
             success: false,
             message: err.message,
@@ -49,7 +49,75 @@ const getAllIssues = async (req: Request, res: Response) => {
     }
 };
 
+
+const getSingleIssue = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || Array.isArray(id)) {
+            return sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Issue ID is required",
+            });
+        }
+
+        const result = await issueService.getSingleIssueFromDB(id);
+
+        if (!result) {
+            return sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Issue not found",
+            });
+        }
+
+        res.status(200).json({
+            success : true,
+            data : result,
+        })
+    } catch (err: any) {
+        // console.error(err);
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to retrieve the issue",
+            error: err.message
+        });
+    }
+};
+
+const updateIssue = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        
+        const user = req.user;
+
+        // console.log("here");
+        const result = await issueService.updateIssue(id as string, req.body);
+
+        return sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Issue updated successfully",
+            data: result,
+        });
+    }
+    catch(err : any){
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to Update the issue",
+            error: err.message
+        });
+    }
+}
+
+const 
+
 export const issueController = {
     createIssue,
     getAllIssues,
+    getSingleIssue,
+    updateIssue,
 }

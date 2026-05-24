@@ -77,7 +77,7 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
         
         return {
             ...issueData,
-            reporter: userMap.get(reporter_id) || null // Attach the user object
+            reporter: userMap.get(reporter_id) || null 
         };
     });
 
@@ -85,7 +85,70 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
 };
 
 
+const getSingleIssueFromDB = async (id: string) => {
+    const issueResult = await pool.query(
+        `SELECT * FROM issues WHERE id = $1`,
+        [id]
+    );
+    const issue = issueResult.rows[0];
+
+    if (!issue) {
+        return null;
+    }
+
+    const userResult = await pool.query(
+        `SELECT id, name, role FROM users WHERE id = $1`,
+        [issue.reporter_id]
+    );
+    const reporter = userResult.rows[0];
+
+    const { reporter_id, ...issueData } = issue;
+
+    return {
+        ...issueData,
+        reporter: reporter || null 
+    };
+};
+
+const updateIssue = async(id : string, payload : {
+    title : string,
+    description : string,
+    type : "bug" | "feature_request"
+}) => {
+
+    // console.log("here");
+
+    const { title, description, type } = payload;
+    
+    const updateResult = await pool.query(
+        `
+            UPDATE issues
+            SET 
+                title = COALESCE($1, title),
+                description = COALESCE($2, description),
+                type = COALESCE($3, type),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $4
+            RETURNING *
+        `,
+        [title, description, type, id]);
+
+    return updateResult.rows[0];
+
+};
+
+const deleteIssueFromDB = async (id : string) =>{
+    await pool.query(`
+            DELETE FROM issues
+            WHERE id = $1
+        `,[id]);
+};
+
+
 export const issueService = {
     createIssue,
     getAllIssuesFromDB,
+    getSingleIssueFromDB,
+    updateIssue,
+    deleteIssueFromDB
 }

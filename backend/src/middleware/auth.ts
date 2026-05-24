@@ -9,6 +9,7 @@ import sendResponse from "../utility/sendResponse";
 const auth = (...roles : ROLE[])=>{
     return async(req : Request, res : Response, next : NextFunction) => {
         try{
+            // console.log("here");
             const token = req.headers.authorization;
 
             if (!token) {
