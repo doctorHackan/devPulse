@@ -14,7 +14,7 @@ const registerUser = async (payload : IUser)=>{
         WHERE email = $1
     `,[email]);
 
-    if(checkResult) throw new Error("Email already registered.");
+    if(checkResult.rows.length == 1) throw new Error("Email already registered.");
     
 
     if(!role) role = "contributor";
