@@ -17,6 +17,7 @@ const auth = (...roles : ROLE[])=>{
                 success: false,
                 message: "Unauthorized access!!",
                 });
+                return;
             }
 
             const payload  = jwt.verify(token as string, config.secret) as JwtPayload;
