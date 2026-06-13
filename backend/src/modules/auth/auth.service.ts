@@ -8,6 +8,14 @@ import jwt from "jsonwebtoken";
 const registerUser = async (payload : IUser)=>{
     const {name, email, password} = payload;
     let {role} = payload;
+    
+    const checkResult = await pool.query(`
+        SELECT * FROM users
+        WHERE email = $1
+    `,[email]);
+
+    if(checkResult) throw new Error("Email already registered.");
+    
 
     if(!role) role = "contributor";
 

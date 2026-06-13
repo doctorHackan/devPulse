@@ -18,7 +18,6 @@ app.use(
 
 
 app.get("/",(req: Request, res : Response)=>{
-    // console.log("here");
     res.json({
         message : "welcome"
     });
