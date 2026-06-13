@@ -26,7 +26,7 @@ app.get("/",(req: Request, res : Response)=>{
 
 
 app.use("/api/auth",authRouter);
-app.use("/api/issue",issueRoute);
+app.use("/api/issues",issueRoute);
 
 app.use(globalErrorHandler);
 
